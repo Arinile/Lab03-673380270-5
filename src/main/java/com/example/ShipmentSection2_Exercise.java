@@ -1,14 +1,15 @@
+package com.example;
 import java.util.ArrayList;
 import java.util.List;
 
 // ╔══════════════════════════════════════════════════════════╗
-//  SECTION 2 — แบบฝึกหัด (Exercise)
-//  ชื่อนักศึกษา : ___________________________
-//  รหัสนักศึกษา : ___________________________
+//  SECTION 1 — แบบฝึกหัด (Exercise)
+//  ชื่อนักศึกษา : ธนบดี เริ่มรักสกุล
+//  รหัสนักศึกษา : 673380270-5
 // ╚══════════════════════════════════════════════════════════╝
 //
 //  โจทย์:
-//    บริษัท FlashMove Express มีรายการ Shipment หลายรายการ
+//    บริษัท SpeedEx Logistics มีรายการ Shipment หลายรายการ
 //    ให้คำนวณค่าขนส่งตามน้ำหนักและประเภท แล้วแสดงยอดรวม
 //
 //  กฎการคำนวณ:
@@ -17,17 +18,17 @@ import java.util.List;
 //
 //  คำสั่ง:
 //    หา Bug และเติม code ในทุกจุดที่มี 👉 TODO
-//    แล้วรันให้ได้ผลลัพธ์ตาม ExpectedOutput_Section2.md
+//    แล้วรันให้ได้ผลลัพธ์ตาม ExpectedOutput_Section1.md
 // ══════════════════════════════════════════════════════════
 
 // ──────────────────────────────────────────────────────────
 //  PART A : Enum ประเภทการขนส่ง
 // ──────────────────────────────────────────────────────────
-// 👉 TODO A : enum นี้มีแค่ STANDARD
-//             เพิ่ม EXPRESS ให้ครบด้วย
+// 👉 TODO A : enum นี้มีแค่ EXPRESS
+//             เพิ่ม STANDARD ให้ครบด้วย
 enum ShipmentType {
+    EXPRESS,
     STANDARD
-    // เพิ่ม EXPRESS ตรงนี้
 }
 
 // ──────────────────────────────────────────────────────────
@@ -39,26 +40,27 @@ class Shipment {
     private double       weightKg;
     private ShipmentType type;
 
-    // 👉 TODO B : assignment ใน Constructor ผิดทั้งคู่
-    //             weightKg ถูก assign ให้ type
-    //             type ถูก assign ให้ weightKg
+    // 👉 TODO B : ลำดับ parameter ของ Constructor สลับกัน
+    //             ที่ถูกต้องต้องเป็น  (trackingNumber, weightKg, type)
+    //             แต่ตอนนี้เป็น      (trackingNumber, type, weightKg)  ← ผิด
     //             แก้ให้ถูกต้อง
     public Shipment(String trackingNumber, double weightKg, ShipmentType type) {
         this.trackingNumber = trackingNumber;
-        this.weightKg       = type;       // ← ผิด ควรเป็น weightKg
-        this.type           = weightKg;   // ← ผิด ควรเป็น type
+        this.weightKg       = weightKg;
+        this.type           = type;
     }
 
     public String       getTrackingNumber() { return trackingNumber; }
     public double       getWeightKg()       { return weightKg;       }
     public ShipmentType getType()           { return type;           }
 
-    // 👉 TODO C : สูตรคำนวณผิด — คูณ weightKg ด้วย 1 เสมอ
-    //             แก้ให้ใช้ STANDARD_RATE และ EXPRESS_RATE ที่ถูกต้อง
-    //             STANDARD_RATE = 40.0 , EXPRESS_RATE = 100.0
+    // 👉 TODO C : ค่าอัตราค่าขนส่งสลับกัน!
+    //             STANDARD_RATE ต้องเป็น  40.0
+    //             EXPRESS_RATE  ต้องเป็น 100.0
+    //             แก้ให้ถูกต้อง
     public double calculateCost() {
-        final double STANDARD_RATE = 1.0;   // ← ผิด ควรเป็น 40.0
-        final double EXPRESS_RATE  = 1.0;   // ← ผิด ควรเป็น 100.0
+        final double STANDARD_RATE = 40.0;   // ← ผิด
+        final double EXPRESS_RATE  =  100.0;   // ← ผิด
         if (type == ShipmentType.STANDARD) {
             return weightKg * STANDARD_RATE;
         } else {
@@ -67,12 +69,12 @@ class Shipment {
     }
 
     // 👉 TODO D : toString() ยังไม่สมบูรณ์
-    //             ให้แสดงในรูปแบบนี้ (ดูตัวอย่างใน ExpectedOutput_Section2.md):
-    //             [FM001]  4.00 กก. | STANDARD |    160.00 บาท
+    //             ให้แสดงในรูปแบบนี้ (ดูตัวอย่างใน ExpectedOutput_Section1.md):
+    //             [TH001]  3.00 กก. | STANDARD |    120.00 บาท
     //             แนะนำ: ใช้ String.format() และเรียก calculateCost()
     @Override
     public String toString() {
-        return "[" + trackingNumber + "] ???";  // ← เติมให้ครบ
+        return "[" + trackingNumber.toString() + "] ???";  // ← เติมให้ครบ
     }
 }
 
@@ -89,18 +91,21 @@ class ShippingCompany {
     //             เพิ่ม  shipments = new ArrayList<>();  ใน constructor
     public ShippingCompany(String name) {
         this.name = name;
-        // เพิ่มบรรทัด initialize ตรงนี้
+        this.shipments = new ArrayList<>();
     }
 
     public void addShipment(Shipment s) {
         shipments.add(s);
     }
 
-    // 👉 TODO F : getTotalCost() คืนค่า 0 เสมอ เพราะยังไม่ได้วนลูปจริง
+    // 👉 TODO F : getTotalCost() ยังไม่ได้วนลูปจริง
     //             ให้รวม calculateCost() ของทุก Shipment ใน list
     public double getTotalCost() {
         double total = 0;
         // วนลูปรวม cost ของแต่ละ shipment ตรงนี้
+        for (Shipment data : shipments) {
+            total += data.calculateCost();
+        }
         return total;
     }
 
@@ -115,26 +120,29 @@ class ShippingCompany {
         System.out.println("========================================");
 
         // 1) วนลูปแสดงแต่ละ shipment ตรงนี้
-
+        for (Shipment data : shipments) {
+            System.out.println("["+(data.getTrackingNumber().toString())+"]  "+(Double.valueOf(data.getWeightKg()).toString())+" กก. | "+(data.getType().toString())+" |    "+(Double.valueOf(data.calculateCost()).toString())+" บาท");
+        }
         System.out.println("----------------------------------------");
         // 2) แสดงยอดรวมตรงนี้
+        System.out.println(this.getTotalCost());
     }
 }
 
 // ──────────────────────────────────────────────────────────
 //  PART D : Main
 // ──────────────────────────────────────────────────────────
-public class ShipmentSection2_Exercise {
+public class ShipmentSection1_Exercise {
     public static void main(String[] args) {
 
-        ShippingCompany company = new ShippingCompany("FlashMove Express");
+        ShippingCompany company = new ShippingCompany("SpeedEx Logistics");
 
         // (trackingNumber, weightKg, type)
-        company.addShipment(new Shipment("FM001",  4.0,  ShipmentType.STANDARD));
-        company.addShipment(new Shipment("FM002",  2.5,  ShipmentType.EXPRESS));
-        company.addShipment(new Shipment("FM003",  6.0,  ShipmentType.STANDARD));
-        company.addShipment(new Shipment("FM004",  1.0,  ShipmentType.EXPRESS));
-        company.addShipment(new Shipment("FM005",  8.0,  ShipmentType.STANDARD));
+        company.addShipment(new Shipment("TH001",  3.0,  ShipmentType.STANDARD));
+        company.addShipment(new Shipment("TH002",  1.5,  ShipmentType.EXPRESS));
+        company.addShipment(new Shipment("TH003",  5.0,  ShipmentType.STANDARD));
+        company.addShipment(new Shipment("TH004",  2.0,  ShipmentType.EXPRESS));
+        company.addShipment(new Shipment("TH005", 10.0,  ShipmentType.STANDARD));
 
         company.printSummary();
     }
